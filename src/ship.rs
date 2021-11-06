@@ -1,4 +1,5 @@
 use bevy::prelude::*;
+use crate::constants::*;
 
 struct ShipMaterialResource {
     ship_texture: Handle<ColorMaterial>,
@@ -71,6 +72,8 @@ pub struct ShipPlugin;
 impl Plugin for ShipPlugin {
     fn build(&self, app: &mut AppBuilder) {
         app.init_resource::<ShipMaterialResource>()
-        .add_startup_system(spawn_ship.system());
+        //.add_state(AppState::InGame)
+        .add_system_set(SystemSet::on_enter(AppState::InGame).with_system(spawn_ship.system()));
+        //.add_startup_system(spawn_ship.system());
     }
 }

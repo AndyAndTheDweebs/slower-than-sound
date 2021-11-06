@@ -3,34 +3,28 @@ mod ship;
 use ship::ShipPlugin;
 mod window;
 use window::WindowPlugin;
+mod constants;
+use constants::*;
+mod menu;
+use menu::MenuPlugin;
 
 fn main() {
     App::build()
-    .add_startup_system(setup.system())
     .add_plugins(DefaultPlugins)
     .add_plugin(ShipPlugin)
-    .add_plugin(WindowPlugin)
+    //.add_plugin(WindowPlugin)
+    .add_plugin(MenuPlugin)
+    .add_startup_system(setup.system())
+    //.add_state(AppState::MainMenu)
+    //.add_system_set(
+    //    SystemSet::on_update(AppState::MainMenu)
+    //    .with_system(helloWorld.system())
+    //)
     .run();
 }
-
-struct _texture;
-
-struct Player;
-struct PlayerXp(u32);
-struct PlayerName(String);
-struct PlayerHealth(u32);
-
-#[derive(Bundle)]
-struct PlayerBundle {
-    xp: PlayerXp,
-    name: PlayerName,
-    health: PlayerHealth,
-    _p: Player,
-
-    #[bundle]
-    sprite: SpriteBundle,
+fn helloWorld(){
+    println!("hello world");
 }
-
 
 /*
 * function: setup
