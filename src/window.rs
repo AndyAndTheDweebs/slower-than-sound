@@ -1,6 +1,7 @@
 use bevy::prelude::*;
 use bevy::window::{WindowResized};
 use crate::ship::*;
+use crate::constants::*;
 
 struct InitalWindow {
     width: f32,
@@ -69,6 +70,8 @@ impl Plugin for WindowPlugin {
     fn build(&self, app: &mut AppBuilder) {
         app
         .add_startup_system(setup.system())
-        .add_system(window_resize_event.system());
+        //.add_system(window_resize_event.system())
+        //.add_state(AppState::InGame)
+        .add_system_set(SystemSet::on_update(AppState::InGame).with_system(window_resize_event.system()));
     }
 }

@@ -12,7 +12,7 @@ fn main() {
     App::build()
     .add_plugins(DefaultPlugins)
     .add_plugin(ShipPlugin)
-    //.add_plugin(WindowPlugin)
+    .add_plugin(WindowPlugin)
     .add_plugin(MenuPlugin)
     .add_startup_system(setup.system())
     //.add_state(AppState::MainMenu)
