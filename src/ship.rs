@@ -1,0 +1,55 @@
+use bevy::prelude::*;
+
+struct ShipMaterialResource {
+    ship_texture: Handle<ColorMaterial>,
+}
+
+pub struct _texture;
+
+impl FromWorld for ShipMaterialResource {
+    fn from_world(world: &mut World) -> Self {
+        let world = world.cell();
+
+        let mut materials = world.get_resource_mut::<Assets<ColorMaterial>>().unwrap();
+        let asset_server = world.get_resource::<AssetServer>().unwrap();
+
+        let ship_handle = asset_server.load("ship.png");
+
+        ShipMaterialResource{
+            ship_texture: materials.add(ship_handle.into())
+        }
+    }
+}
+
+/*
+* function: spawn_ship
+*
+* type: system startup call
+*
+* description: called once during inital boot to create ship
+*
+* parameters:
+*   commands: mutable variable used to execute commands
+*   materials: needed for loading sprites
+*   
+* return: none
+*/
+
+fn spawn_ship(
+    mut commands: Commands,
+    materials: Res<ShipMaterialResource>,
+) {
+    commands.spawn_bundle(SpriteBundle {
+        material: materials.ship_texture.clone(),
+        sprite: Sprite{ size: Vec2::new(550.0, 250.0), flip_x: true, flip_y: false, resize_mode: SpriteResizeMode::Manual },
+        ..Default::default()
+    }).insert(_texture);
+}
+
+pub struct ShipPlugin;
+impl Plugin for ShipPlugin {
+    fn build(&self, app: &mut AppBuilder) {
+        app.init_resource::<ShipMaterialResource>()
+        .add_startup_system(spawn_ship.system());
+    }
+}
