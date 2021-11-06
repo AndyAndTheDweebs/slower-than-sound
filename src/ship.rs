@@ -3,8 +3,19 @@ use bevy::prelude::*;
 struct ShipMaterialResource {
     ship_texture: Handle<ColorMaterial>,
 }
-
+//TODO:
+//public struct used as mark for window scaling, should be moved to more approriate class
 pub struct _texture;
+
+/*
+* function: impl
+*
+* type: initalization
+*
+* description: used to allow bevy to handle resource initalization once .init_resource is called
+*   
+* return: none
+*/
 
 impl FromWorld for ShipMaterialResource {
     fn from_world(world: &mut World) -> Self {
@@ -45,6 +56,16 @@ fn spawn_ship(
         ..Default::default()
     }).insert(_texture);
 }
+
+/*
+* function: impl
+*
+* type: plugin
+*
+* description: creation of plugin for ship, used to be called 
+*   
+* return: none
+*/
 
 pub struct ShipPlugin;
 impl Plugin for ShipPlugin {

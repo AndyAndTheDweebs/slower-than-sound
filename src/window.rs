@@ -54,6 +54,16 @@ fn window_resize_event(mut events: EventReader<WindowResized>, mut texture: Quer
     }
 }
 
+/*
+* function: impl
+*
+* type: plugin
+*
+* description: creation of plugin for window, used to be called 
+*   
+* return: none
+*/
+
 pub struct WindowPlugin;
 impl Plugin for WindowPlugin {
     fn build(&self, app: &mut AppBuilder) {
