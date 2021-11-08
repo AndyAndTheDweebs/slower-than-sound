@@ -38,7 +38,6 @@ impl MenuButton {
         }
     }
 }
-
 struct button;
 
 struct MenuUI;
@@ -77,8 +76,6 @@ fn setup_menu(
                         .spawn_bundle(ButtonBundle {
                             style: Style {
                                 size: Size::new(Val::Px(100.0), Val::Px(50.0)),
-                                //margin: Rect::all(Val::Auto),
-                                //align_self:AlignSelf::FlexEnd,
                                 justify_content: JustifyContent::Center,
                                 ..Default::default()
                             },
@@ -88,7 +85,6 @@ fn setup_menu(
                         .with_children(|parent| {
                             parent.spawn_bundle(TextBundle {
                                 style: Style {
-                                    //margin: Rect::all(Val::Px(5.0)),
                                     align_self: AlignSelf::Center,
                                     ..Default::default()
                                 },
@@ -109,25 +105,12 @@ fn setup_menu(
                     parent.spawn_bundle(ImageBundle {
                         style: Style {
                             size: Size::new(Val::Px(550.0), Val::Px(250.0)),
-                            //align_self:AlignSelf::Center,
-                            //justify_content: JustifyContent::Center,
                             ..Default::default()
                         },
-                        //material: materials.add( Color::rgb(0.9, 0.9, 0.9).into()),
                         material: materials.add(asset_server.load("ship.png").into()),
                         ..Default::default()
                     });
-
-                    //.with_children(|parent| {
                     parent.spawn_bundle(TextBundle {
-                        style: Style {
-                            //margin: Rect::all(Val::Px(20.0)),
-                            //position_type: PositionType::Absolute,
-                            //align_items: AlignItems::FlexEnd,
-                            //flex_direction: FlexDirection::Column,
-                            //justify_content: JustifyContent::Center,
-                            ..Default::default()
-                        },
                         text: Text::with_section(
                             "ship stats",
                             TextStyle {
@@ -139,90 +122,7 @@ fn setup_menu(
                         ),
                         ..Default::default()
                     });
-
-                    //});
                 });
-
-            /*
-                     parent
-                            .spawn_bundle(NodeBundle {
-                                style: Style {
-                                    size: Size::new(Val::Percent(100.0), Val::Percent(100.0)),
-                                    position_type: PositionType::Absolute,
-                                    justify_content: JustifyContent::Center,
-                                    align_items: AlignItems::Center,
-                                    ..Default::default()
-                                },
-                                material: materials.add(Color::NONE.into()),
-                                ..Default::default()
-                            })
-                            /*
-                            .with_children(|parent| {
-                                parent.spawn_bundle(NodeBundle {
-                                    style: Style {
-                                        size: Size::new(Val::Px(550.0),Val::Percent(100.0)),
-                                        ..Default::default()
-                                    },
-                                    material: materials.add( Color::rgb(0.9, 0.9, 0.9).into()),
-                                    //material: materials.add(asset_server.load("ship.png").into()),
-                                    ..Default::default()
-                                });
-                            })
-
-                            .with_children(|parent| {
-                                parent.spawn_bundle(SpriteBundle {
-                                    material: materials.add(asset_server.load("ship.png").into()),
-                                    sprite: Sprite::new(Vec2::new(550.0,250.0)),
-                                    ..Default::default()
-                                });
-                            });
-            */
-                            .with_children(|parent| {
-                                parent.spawn_bundle(ImageBundle {
-                                    style: Style {
-                                        size: Size::new(Val::Px(550.0),Val::Px(250.0)),
-                                        ..Default::default()
-                                    },
-                                    //material: materials.add( Color::rgb(0.9, 0.9, 0.9).into()),
-                                    material: materials.add(asset_server.load("ship.png").into()),
-                                    ..Default::default()
-                                });
-                            });
-            */
-
-            /*
-                                parent.spawn_bundle(ButtonBundle {
-                                    style: Style {
-                                        size: Size::new(Val::Px(100.0), Val::Px(100.0)),
-                                        margin: Rect::all(Val::Auto),
-                                        align_self:AlignSelf::FlexEnd,
-                                        //justify_content: JustifyContent::Center,
-                                        ..Default::default()
-                                    },
-                                    material: button_materials.normal.clone(),
-                                    ..Default::default()
-                                })
-                                .with_children(|parent| {
-                                    parent.spawn_bundle(TextBundle {
-                                        style: Style {
-                                            margin: Rect::all(Val::Px(5.0)),
-                                            ..Default::default()
-                                        },
-                                        text: Text::with_section(
-                                            "Confirm",
-                                            TextStyle {
-                                                font: button_materials.font.clone(),
-                                                font_size: 20.0,
-                                                color: Color::rgb(0.9, 0.9, 0.9),
-                                            },
-                                            Default::default(),
-                                        ),
-                                        ..Default::default()
-                                    });
-                                }).insert(button);
-
-            */
-
             parent
                 .spawn_bundle(NodeBundle {
                     style: Style {
@@ -324,74 +224,6 @@ fn setup_menu(
         });
 }
 
-/*
-// Make list of buttons
-let mut buttons = Vec::<MenuButton>::with_capacity(2);
-buttons.push(MenuButton::leftArrow);
-buttons.push(MenuButton::rightArrow);
-
-commands
-    .spawn_bundle(NodeBundle {
-        style: Style {
-            size: Size::new(Val::Percent(100.), Val::Percent(100.)),
-            display: Display::Flex,
-            flex_direction: FlexDirection::Row,
-            align_items: AlignItems::FlexStart,
-            justify_content: JustifyContent::FlexStart,
-            ..Default::default()
-        },
-        material: button_materials.none.clone(),
-        ..Default::default()
-    })
-    .insert(MenuUI)
-    .with_children(|parent| {
-        // Add all of the buttons as children
-        for button in buttons {
-            // Spawn a new button
-            parent
-                .spawn_bundle(ButtonBundle {
-                    style: Style {
-                        size: Size::new(Val::Px(75.0), Val::Px(32.5)),
-                        margin: Rect::all(Val::Auto),
-                        justify_content: JustifyContent::Center,
-                        align_items: AlignItems::Center,
-                        ..Default::default()
-                    },
-                    material: button_materials.normal.clone(),
-                    ..Default::default()
-                })
-                .with_children(|parent| {
-                    parent.spawn_bundle(TextBundle {
-                        text: Text::with_section(
-                            button.name(),
-                            TextStyle {
-                                font: button_materials.font.clone(),
-                                font_size: 20.0,
-                                color: Color::rgb(0.9, 0.9, 0.9),
-                            },
-                            Default::default(),
-                        ),
-                        ..Default::default()
-                    });
-                })
-                .insert(button);
-        }
-    });
-    let texture_handle = asset_server.load("ship.png");
-    commands.spawn_bundle(SpriteBundle {
-    material: materials.add(texture_handle.into()),
-    sprite: Sprite{ size: Vec2::new(550.0, 250.0), flip_x: true, flip_y: false, resize_mode: SpriteResizeMode::Manual },
-    ..Default::default()
-    });
-      */
-
-/*
-fn despawn_menu(mut commands: Commands, query: Query<(Entity, &MenuUI)>) {
-    for (entity, _) in query.iter() {
-        commands.entity(entity).despawn_recursive();
-    }
-}
-*/
 fn button_color_system(
     button_materials: Res<ButtonMaterials>,
     mut query: Query<
@@ -444,7 +276,6 @@ pub struct SelectionMenuPlugin;
 impl Plugin for SelectionMenuPlugin {
     fn build(&self, app: &mut AppBuilder) {
         app.init_resource::<ButtonMaterials>()
-            //.add_state(AppState::SelectionMenu)
             .add_system_set(
                 SystemSet::on_enter(AppState::SelectionMenu).with_system(setup_menu.system()),
             )

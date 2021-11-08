@@ -87,23 +87,6 @@ fn setup(
         .insert(MenuUI);
 }
 
-fn test_state(app_state: Res<State<AppState>>) {
-    match app_state.current() {
-        AppState::MainMenu => {
-            println!("we are in main menu state");
-        }
-        AppState::InGame => {
-            println!("we are in In game state");
-        }
-        AppState::SelectionMenu => {
-            println!("we are in the selection menu");
-        }
-        AppState::Paused => {
-            println!("we are in paused state");
-        }
-    }
-}
-
 fn despawn_menu(mut commands: Commands, query: Query<(Entity, &MenuUI)>) {
     for (entity, _) in query.iter() {
         commands.entity(entity).despawn_recursive();
@@ -114,15 +97,10 @@ pub struct MenuPlugin;
 impl Plugin for MenuPlugin {
     fn build(&self, app: &mut AppBuilder) {
         app.init_resource::<ButtonMaterials>()
-            //.add_startup_system(setup.system())
-            //.add_system(button_system.system())
-            //.add_system(test_state.system())
             .add_state(AppState::MainMenu)
             .add_system_set(SystemSet::on_enter(AppState::MainMenu).with_system(setup.system()))
             .add_system_set(
-                SystemSet::on_update(AppState::MainMenu)
-                    .with_system(button_system.system())
-                    .with_system(test_state.system()),
+                SystemSet::on_update(AppState::MainMenu).with_system(button_system.system()),
             )
             .add_system_set(
                 SystemSet::on_exit(AppState::MainMenu).with_system(despawn_menu.system()),
