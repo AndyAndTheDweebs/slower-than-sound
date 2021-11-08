@@ -2,7 +2,6 @@ use bevy::prelude::*;
 
 use crate::constants::*;
 
-
 struct ButtonMaterials {
     normal: Handle<ColorMaterial>,
     hovered: Handle<ColorMaterial>,
@@ -37,7 +36,7 @@ fn button_system(
             Interaction::Clicked => {
                 text.sections[0].value = "Play".to_string();
                 *material = button_materials.pressed.clone();
-                app_state.set(AppState::InGame).unwrap();
+                app_state.set(AppState::SelectionMenu).unwrap();
             }
             Interaction::Hovered => {
                 text.sections[0].value = "Play".to_string();
@@ -56,7 +55,6 @@ fn setup(
     asset_server: Res<AssetServer>,
     button_materials: Res<ButtonMaterials>,
 ) {
-
     commands
         .spawn_bundle(ButtonBundle {
             style: Style {
@@ -85,17 +83,20 @@ fn setup(
                 ),
                 ..Default::default()
             });
-        }).insert(MenuUI);
+        })
+        .insert(MenuUI);
 }
 
-
-fn test_state(app_state: Res<State<AppState>>){
+fn test_state(app_state: Res<State<AppState>>) {
     match app_state.current() {
         AppState::MainMenu => {
             println!("we are in main menu state");
         }
         AppState::InGame => {
             println!("we are in In game state");
+        }
+        AppState::SelectionMenu => {
+            println!("we are in the selection menu");
         }
         AppState::Paused => {
             println!("we are in paused state");
@@ -112,13 +113,19 @@ fn despawn_menu(mut commands: Commands, query: Query<(Entity, &MenuUI)>) {
 pub struct MenuPlugin;
 impl Plugin for MenuPlugin {
     fn build(&self, app: &mut AppBuilder) {
-        app
-        .init_resource::<ButtonMaterials>()
-        //.add_startup_system(setup.system())
-        .add_system(button_system.system())
-        .add_system(test_state.system())
-        .add_state(AppState::MainMenu)
-        .add_system_set(SystemSet::on_enter(AppState::MainMenu).with_system(setup.system()))
-        .add_system_set(SystemSet::on_exit(AppState::MainMenu).with_system(despawn_menu.system()));
+        app.init_resource::<ButtonMaterials>()
+            //.add_startup_system(setup.system())
+            //.add_system(button_system.system())
+            //.add_system(test_state.system())
+            .add_state(AppState::MainMenu)
+            .add_system_set(SystemSet::on_enter(AppState::MainMenu).with_system(setup.system()))
+            .add_system_set(
+                SystemSet::on_update(AppState::MainMenu)
+                    .with_system(button_system.system())
+                    .with_system(test_state.system()),
+            )
+            .add_system_set(
+                SystemSet::on_exit(AppState::MainMenu).with_system(despawn_menu.system()),
+            );
     }
 }
