@@ -1,7 +1,7 @@
 use crate::constants::*;
 use bevy::prelude::*;
 
-struct ShipMaterialResource {
+pub struct ShipMaterialResource {
     ship_texture: Handle<ColorMaterial>,
 }
 //TODO:
@@ -57,6 +57,10 @@ fn spawn_ship(mut commands: Commands, materials: Res<ShipMaterialResource>) {
                 flip_y: false,
                 resize_mode: SpriteResizeMode::Manual,
             },
+            transform: Transform {
+                translation: Vec3::new(0.0, 0.0, 1.0),
+                ..Default::default()
+            },
             ..Default::default()
         })
         .insert(_texture);
@@ -75,9 +79,11 @@ fn spawn_ship(mut commands: Commands, materials: Res<ShipMaterialResource>) {
 pub struct ShipPlugin;
 impl Plugin for ShipPlugin {
     fn build(&self, app: &mut AppBuilder) {
-        app.init_resource::<ShipMaterialResource>()
-            //.add_state(AppState::InGame)
-            .add_system_set(SystemSet::on_enter(AppState::InGame).with_system(spawn_ship.system()));
+        app.init_resource::<ShipMaterialResource>();
+        //.add_state(AppState::InGame)
+        // .add_system_set(
+        //     SystemSet::on_enter(AppState::SelectionMenu).with_system(spawn_ship.system()),
+        // );
         //.add_system_set(SystemSet::on_update(AppState::InGame).with_system(test_state.system()));
         //.add_startup_system(spawn_ship.system());
     }

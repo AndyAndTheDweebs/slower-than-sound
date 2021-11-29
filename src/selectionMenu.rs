@@ -2,12 +2,19 @@ use bevy::prelude::*;
 
 use crate::constants::*;
 
+use crate::ship::*;
 struct ButtonMaterials {
     none: Handle<ColorMaterial>,
     normal: Handle<ColorMaterial>,
     hovered: Handle<ColorMaterial>,
     pressed: Handle<ColorMaterial>,
     font: Handle<Font>,
+}
+struct ShipMaterials {
+    index: usize,
+    ship1: Handle<ColorMaterial>,
+    ship2: Handle<ColorMaterial>,
+    ship3: Handle<ColorMaterial>,
 }
 
 impl FromWorld for ButtonMaterials {
@@ -26,26 +33,33 @@ impl FromWorld for ButtonMaterials {
     }
 }
 
-enum MenuButton {
-    leftArrow,
-    rightArrow,
-}
-impl MenuButton {
-    fn name(&self) -> String {
-        match self {
-            Self::leftArrow => "<".to_string(),
-            Self::rightArrow => ">".to_string(),
+impl FromWorld for ShipMaterials {
+    fn from_world(world: &mut World) -> Self {
+        let world = world.cell();
+
+        let mut materials = world.get_resource_mut::<Assets<ColorMaterial>>().unwrap();
+        let asset_server = world.get_resource_mut::<AssetServer>().unwrap();
+        ShipMaterials {
+            index: 0,
+            ship1: materials.add(asset_server.load("ship.png").into()),
+            ship2: materials.add(asset_server.load("ship_guns.png").into()),
+            ship3: materials.add(asset_server.load("lifeboat.png").into()),
         }
     }
 }
-struct button;
-
+enum MenuButton {
+    leftArrow,
+    rightArrow,
+    confirm,
+}
+struct imageHolder;
 struct MenuUI;
 fn setup_menu(
     mut commands: Commands,
     button_materials: Res<ButtonMaterials>,
     asset_server: Res<AssetServer>,
     mut materials: ResMut<Assets<ColorMaterial>>,
+    ship_materials: Res<ShipMaterials>,
 ) {
     commands
         .spawn_bundle(NodeBundle {
@@ -82,6 +96,7 @@ fn setup_menu(
                             material: button_materials.normal.clone(),
                             ..Default::default()
                         })
+                        .insert(MenuButton::confirm)
                         .with_children(|parent| {
                             parent.spawn_bundle(TextBundle {
                                 style: Style {
@@ -99,17 +114,19 @@ fn setup_menu(
                                 ),
                                 ..Default::default()
                             });
-                        })
-                        .insert(button);
+                        });
 
-                    parent.spawn_bundle(ImageBundle {
-                        style: Style {
-                            size: Size::new(Val::Px(550.0), Val::Px(250.0)),
+                    parent
+                        .spawn_bundle(ImageBundle {
+                            style: Style {
+                                size: Size::new(Val::Px(550.0), Val::Px(250.0)),
+                                ..Default::default()
+                            },
+                            material: ship_materials.ship1.clone(),
                             ..Default::default()
-                        },
-                        material: materials.add(asset_server.load("ship.png").into()),
-                        ..Default::default()
-                    });
+                        })
+                        .insert(imageHolder);
+
                     parent.spawn_bundle(TextBundle {
                         text: Text::with_section(
                             "ship stats",
@@ -158,6 +175,7 @@ fn setup_menu(
                                     material: button_materials.normal.clone(),
                                     ..Default::default()
                                 })
+                                .insert(MenuButton::leftArrow)
                                 .with_children(|parent| {
                                     parent.spawn_bundle(TextBundle {
                                         style: Style {
@@ -175,8 +193,7 @@ fn setup_menu(
                                         ),
                                         ..Default::default()
                                     });
-                                })
-                                .insert(button);
+                                });
                         });
                 });
             parent
@@ -201,6 +218,7 @@ fn setup_menu(
                             material: button_materials.normal.clone(),
                             ..Default::default()
                         })
+                        .insert(MenuButton::rightArrow)
                         .with_children(|parent| {
                             parent.spawn_bundle(TextBundle {
                                 style: Style {
@@ -218,10 +236,10 @@ fn setup_menu(
                                 ),
                                 ..Default::default()
                             });
-                        })
-                        .insert(button);
+                        });
                 });
-        });
+        })
+        .insert(MenuUI);
 }
 
 fn button_color_system(
@@ -246,43 +264,68 @@ fn button_color_system(
     }
 }
 
-/*
 fn button_press_system(
     mut commands: Commands,
     asset_server: Res<AssetServer>,
-    query: Query<(&Interaction, &MenuButton), (Changed<Interaction>, With<Button>)>,
+    interaction_query: Query<(&Interaction, &MenuButton), (Changed<Interaction>, With<Button>)>,
+    mut image_query: Query<(&imageHolder, &mut Handle<ColorMaterial>)>,
     mut state: ResMut<State<AppState>>,
+    mut materials: ResMut<Assets<ColorMaterial>>,
+    mut ship_materials: ResMut<ShipMaterials>,
 ) {
-    for (interaction, button) in query.iter() {
+    let array = [
+        ship_materials.ship1.clone(),
+        ship_materials.ship2.clone(),
+        ship_materials.ship3.clone(),
+    ];
+    for (interaction, menu_button_action) in interaction_query.iter() {
         if *interaction == Interaction::Clicked {
-            match button {
-                MenuButton::MakeMap => state
-                    .set(AppState::MakeMap)
-                    .expect("Couldn't switch state to MakeMap"),
-                MenuButton::PlaySong(song) => {
-                    let config = load_config(&*format!("{}.toml", song), &asset_server);
-                    commands.insert_resource(config);
-                    state
-                        .set(AppState::Game)
-                        .expect("Couldn't switch state to Game")
+            match menu_button_action {
+                MenuButton::confirm => {
+                    state.set(AppState::InGame).unwrap();
                 }
-            };
+                MenuButton::leftArrow => {
+                    for (hold, mut image) in image_query.iter_mut() {
+                        if ship_materials.index > 0 {
+                            ship_materials.index -= 1;
+                            *image = array[ship_materials.index].clone();
+                        }
+                    }
+                }
+                MenuButton::rightArrow => {
+                    for (hold, mut image) in image_query.iter_mut() {
+                        if ship_materials.index < 2 {
+                            ship_materials.index += 1;
+                            *image = array[ship_materials.index].clone();
+                        }
+                    }
+                }
+            }
         }
     }
 }
-*/
+
+fn despawn_menu(mut commands: Commands, query: Query<(Entity, &MenuUI)>) {
+    for (entity, _) in query.iter() {
+        commands.entity(entity).despawn_recursive();
+    }
+}
 
 pub struct SelectionMenuPlugin;
 impl Plugin for SelectionMenuPlugin {
     fn build(&self, app: &mut AppBuilder) {
         app.init_resource::<ButtonMaterials>()
+            .init_resource::<ShipMaterials>()
             .add_system_set(
                 SystemSet::on_enter(AppState::SelectionMenu).with_system(setup_menu.system()),
             )
             .add_system_set(
                 SystemSet::on_update(AppState::SelectionMenu)
-                    .with_system(button_color_system.system()), //.with_system(button_press_system.system()),
+                    .with_system(button_color_system.system())
+                    .with_system(button_press_system.system()),
+            )
+            .add_system_set(
+                SystemSet::on_exit(AppState::SelectionMenu).with_system(despawn_menu.system()),
             );
-        //.add_system_set(SystemSet::on_exit(AppState::SelectionMenu).with_system(despawn_menu.system()));
     }
 }

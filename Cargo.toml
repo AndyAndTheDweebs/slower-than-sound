@@ -7,3 +7,4 @@ edition = "2018"
 
 [dependencies]
 bevy = "0.5"
+bevy-prototype-parallax = { git = "https://github.com/btrepp/bevy-prototype-parallax", branch = "main" }
